@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <title>Repositoris de GitHub</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 (el mateix enllaç que fa servir W3Schools) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- jQuery (el mateix enllaç que fa servir W3Schools) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-3">
+
+  <h2>Repositoris de GitHub</h2>
+  <p>Escriu un nom d'usuari de GitHub i prem el botó.</p>
+
+  <!-- Caixa per escriure l'usuari -->
+  <div class="mb-3">
+    <label for="usuari" class="form-label">Usuari:</label>
+    <input type="text" class="form-control" id="usuari" placeholder="Per exemple: torvalds">
+  </div>
+  <button id="boto" class="btn btn-primary">Mostra els repositoris</button>
+
+  <!-- Missatge d'error (amagat fins que faci falta) -->
+  <div id="error" class="alert alert-danger mt-3" style="display:none">
+    No s'ha trobat aquest usuari.
+  </div>
+
+  <!-- Taula on sortiran els repositoris -->
+  <table class="table table-striped mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>Nom</th>
+        <th>Descripció</th>
+        <th>Seguidors (estrelles)</th>
+      </tr>
+    </thead>
+    <tbody id="files">
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+$(document).ready(function(){
+
+  // Quan es prem el botó...
+  $("#boto").click(function(){
+
+    // 1. Llegim el que ha escrit l'usuari
+    var usuari = $("#usuari").val();
+
+    // 2. Buidem la taula i amaguem l'error d'abans
+    $("#files").empty();
+    $("#error").hide();
+
+    // 3. Demanem els repositoris a l'API de GitHub
+    $.get("https://api.github.com/users/" + usuari + "/repos", function(repos){
+
+      // 4. Per a cada repositori, afegim una fila a la taula
+      $.each(repos, function(i, repo){
+        var descripcio = repo.description;
+        if (descripcio == null) {
+          descripcio = "";
+        }
+        $("#files").append(
+          "<tr>" +
+            "<td>" + repo.name + "</td>" +
+            "<td>" + descripcio + "</td>" +
+            "<td>" + repo.stargazers_count + "</td>" +
+          "</tr>"
+        );
+      });
+
+    }).fail(function(){
+      // Si l'usuari no existeix, ensenyem l'error
+      $("#error").show();
+    });
+
+  });
+
+});
+</script>
+
+</body>
+</html>
